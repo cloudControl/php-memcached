@@ -2749,6 +2749,81 @@ static PHP_METHOD(Memcached, setSaslAuthData)
 	RETURN_TRUE;
 }
 /* }}} */
+
+/* {{{ Memcached::setSaslData(string user, string pass)
+   Sets sasl credentials (the same as Memcached::setSaslAuthData, for backward compatibility only) */
+static PHP_METHOD(Memcached, setSaslData)
+{
+	zend_error(E_DEPRECATED, "setSaslData is deprecated, use setSaslAuthData instead");
+
+	MEMC_METHOD_INIT_VARS;
+	memcached_return status;
+
+	char *user, *pass;
+	int user_len, pass_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss", &user, &user_len, &pass, &pass_len) == FAILURE) {
+		return;
+	}
+
+	if (!MEMC_G(use_sasl)) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, "SASL support (memcached.use_sasl) isn't enabled in php.ini");
+		RETURN_FALSE;
+	}
+
+	MEMC_METHOD_FETCH_OBJECT;
+
+	if (!memcached_behavior_get(m_obj->memc, MEMCACHED_BEHAVIOR_BINARY_PROTOCOL)) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, "SASL is only supported with binary protocol");
+		RETURN_FALSE;
+	}
+	m_obj->has_sasl_data = 1;
+	status = memcached_set_sasl_auth_data(m_obj->memc, user, pass);
+
+	if (php_memc_handle_error(i_obj, status TSRMLS_CC) < 0) {
+		RETURN_FALSE;
+	}
+	RETURN_TRUE;
+}
+/* }}} */
+
+/* {{{ Memcached::configureSasl(string user, string pass)
+   Sets sasl credentials and changes the behavior to binary protocol */
+static PHP_METHOD(Memcached, configureSasl)
+{
+	zend_error(E_DEPRECATED, "configureSasl is deprecated, use setSaslAuthData instead and set binary protocol");
+
+	MEMC_METHOD_INIT_VARS;
+	memcached_return status;
+
+	char *user, *pass;
+	int user_len, pass_len;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss", &user, &user_len, &pass, &pass_len) == FAILURE) {
+		return;
+	}
+
+	if (!MEMC_G(use_sasl)) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, "SASL support (memcached.use_sasl) isn't enabled in php.ini");
+		RETURN_FALSE;
+	}
+
+	MEMC_METHOD_FETCH_OBJECT;
+
+	if (memcached_behavior_set(m_obj->memc, MEMCACHED_BEHAVIOR_BINARY_PROTOCOL, 1) != MEMCACHED_SUCCESS) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to set SASL binary protocol");
+		RETURN_FALSE;
+	}
+	m_obj->has_sasl_data = 1;
+	status = memcached_set_sasl_auth_data(m_obj->memc, user, pass);
+
+	if (php_memc_handle_error(i_obj, status TSRMLS_CC) < 0) {
+		RETURN_FALSE;
+	}
+	RETURN_TRUE;
+}
+/* }}} */
+
 #endif /* HAVE_MEMCACHED_SASL */
 
 /* {{{ Memcached::getResultCode()
@@ -4040,6 +4115,16 @@ ZEND_BEGIN_ARG_INFO(arginfo_setSaslAuthData, 0)
 	ZEND_ARG_INFO(0, password)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO(arginfo_setSaslData, 0)
+        ZEND_ARG_INFO(0, username)
+        ZEND_ARG_INFO(0, password)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO(arginfo_configureSasl, 0)
+        ZEND_ARG_INFO(0, username)
+        ZEND_ARG_INFO(0, password)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO(arginfo_setOption, 0)
 	ZEND_ARG_INFO(0, option)
 	ZEND_ARG_INFO(0, value)
@@ -4143,7 +4228,9 @@ static zend_function_entry memcached_class_methods[] = {
 	MEMC_ME(setOptions,         arginfo_setOptions)
 	MEMC_ME(setBucket,          arginfo_setBucket)
 #ifdef HAVE_MEMCACHED_SASL
-    MEMC_ME(setSaslAuthData,    arginfo_setSaslAuthData)
+	MEMC_ME(setSaslAuthData,    arginfo_setSaslAuthData)
+	MEMC_ME(setSaslData,        arginfo_setSaslData)
+	MEMC_ME(configureSasl,      arginfo_configureSasl)
 #endif
 	MEMC_ME(isPersistent,       arginfo_isPersistent)
 	MEMC_ME(isPristine,         arginfo_isPristine)

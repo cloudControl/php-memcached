@@ -202,7 +202,7 @@ class Memcached {
 	public function getDelayedByKey( $server_key, array $keys, $with_cas = null, $value_cb = null ) {}
 
 	public function fetch( ) {}
-	
+
 	public function fetchAll( ) {}
 
 	public function set( $key, $value, $expiration = 0, $udf_flags = 0 ) {}
@@ -250,7 +250,7 @@ class Memcached {
 	public function decrement( $key, $offset = 1, $initial_value = 0, $expiry = 0) {}
 
 	public function getOption( $option ) {}
-	
+
 	public function setOption( $option, $value ) {}
 
 	public function setOptions( array $options ) {}
@@ -276,7 +276,7 @@ class Memcached {
 	public function flush( $delay = 0 ) {}
 
 	public function getStats( ) {}
-	
+
 	public function getVersion( ) {}
 
 	public function getResultCode( ) {}
@@ -288,6 +288,10 @@ class Memcached {
 	public function isPristine( ) {}
 
 	public function setSaslAuthData( $username, $password ) {}
+
+	public function setSaslData($username, $password) {}
+
+	public function configureSasl($username, $password) {}
 
 }
 
