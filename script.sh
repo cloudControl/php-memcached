@@ -1,6 +1,7 @@
 cd /tmp
 export LC_ALL="en_US.UTF-8"
 locale-gen en_US.UTF-8
+aptitude update
 
 # libmemcache
 apt-get install -y libsasl2-dev

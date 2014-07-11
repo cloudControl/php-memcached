@@ -304,7 +304,7 @@ PHP_INI_BEGIN()
 
 	STD_PHP_INI_ENTRY("memcached.serializer",		SERIALIZER_DEFAULT_NAME, PHP_INI_ALL, OnUpdateSerializer, serializer_name,	zend_php_memcached_globals,	php_memcached_globals)
 #if HAVE_MEMCACHED_SASL
-	STD_PHP_INI_ENTRY("memcached.use_sasl",	"0", PHP_INI_SYSTEM, OnUpdateBool, use_sasl,	zend_php_memcached_globals,	php_memcached_globals)
+	STD_PHP_INI_ENTRY("memcached.use_sasl",	"1", PHP_INI_SYSTEM, OnUpdateBool, use_sasl,	zend_php_memcached_globals,	php_memcached_globals)
 #endif
 	STD_PHP_INI_ENTRY("memcached.store_retry_count",	"2",		PHP_INI_ALL, OnUpdateLong, store_retry_count,			zend_php_memcached_globals,     php_memcached_globals)
 PHP_INI_END()
@@ -4303,7 +4303,7 @@ PHP_GINIT_FUNCTION(php_memcached)
 	php_memcached_globals->compression_type_real = COMPRESSION_TYPE_FASTLZ;
 	php_memcached_globals->compression_factor = 1.30;
 #if HAVE_MEMCACHED_SASL
-	php_memcached_globals->use_sasl = 0;
+	php_memcached_globals->use_sasl = 1;
 #endif
 	php_memcached_globals->store_retry_count = 2;
 }
